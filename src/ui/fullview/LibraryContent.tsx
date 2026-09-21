@@ -2,6 +2,7 @@ import { ArrowDownWideNarrow, ChevronDown, ChevronLeft, ChevronRight, LayoutGrid
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { i18n } from '#imports';
 import {
+  duplicateGuide,
   type GuideChangeEvent,
   getFirstScreenshot,
   getGuides,
@@ -14,6 +15,7 @@ import {
   toggleStar,
 } from '@/core/guides/service';
 import type { Guide, Screenshot } from '@/core/guides/types';
+import { logger } from '@/lib/logger';
 import { useFullview } from '@/stores/fullview';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/components/ui/tooltip';
 import ConfirmDeleteModal from './components/ConfirmDeleteModal';
@@ -165,6 +167,7 @@ export default function LibraryContent({ category }: LibraryContentProps) {
   const [sortOpen, setSortOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [duplicateFailed, setDuplicateFailed] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
 
   const allGuidesRef = useRef<Guide[]>([]);
@@ -267,6 +270,19 @@ export default function LibraryContent({ category }: LibraryContentProps) {
     await softDeleteGuide(id);
     await loadGuides();
   };
+  const handleDuplicate = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setDuplicateFailed(false);
+    try {
+      if (!(await duplicateGuide(id))) throw new Error('guide not found');
+    } catch (err) {
+      logger.error(' Duplicate guide failed', err);
+      setDuplicateFailed(true);
+      return;
+    }
+    await loadGuides();
+    await refreshCounts();
+  };
   const handleRestore = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     await restoreGuide(id);
@@ -330,6 +346,12 @@ export default function LibraryContent({ category }: LibraryContentProps) {
         </Tooltip>
       </div>
 
+      {duplicateFailed && (
+        <p role="alert" className="text-xs mb-3 text-center text-destructive">
+          {i18n.t('library_duplicateFailed')}
+        </p>
+      )}
+
       {loading ? (
         <p className="text-sm py-12 text-center text-purple">{i18n.t('common_loading')}</p>
       ) : allGuidesRef.current.length === 0 ? (
@@ -345,6 +367,7 @@ export default function LibraryContent({ category }: LibraryContentProps) {
           onTrash={handleTrash}
           onRestore={handleRestore}
           onPermanentDelete={handlePermanentDelete}
+          onDuplicate={handleDuplicate}
         />
       ) : (
         <GuideGridView
@@ -353,6 +376,7 @@ export default function LibraryContent({ category }: LibraryContentProps) {
           onTrash={handleTrash}
           onRestore={handleRestore}
           onPermanentDelete={handlePermanentDelete}
+          onDuplicate={handleDuplicate}
         />
       )}
 
