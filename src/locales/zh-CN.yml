@@ -44,6 +44,9 @@ library:
   moveToTrash: 移至回收站
   deletePermanently: 永久删除
   openInFullView: 在完整视图中打开
+  duplicate: 创建副本
+  copyOfTitle: "$1 的副本"
+  duplicateFailed: 无法复制此指南
 
 guideme:
   live: 实时

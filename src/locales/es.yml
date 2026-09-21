@@ -44,6 +44,9 @@ library:
   moveToTrash: Mover a la papelera
   deletePermanently: Eliminar definitivamente
   openInFullView: Abrir en vista completa
+  duplicate: Duplicar
+  copyOfTitle: "Copia de $1"
+  duplicateFailed: No se pudo duplicar esta guía
 
 guideme:
   live: En vivo

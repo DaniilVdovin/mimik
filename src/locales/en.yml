@@ -44,6 +44,9 @@ library:
   moveToTrash: Move to trash
   deletePermanently: Delete permanently
   openInFullView: Open in full view
+  duplicate: Duplicate
+  copyOfTitle: "Copy of $1"
+  duplicateFailed: Could not duplicate this guide
 
 guideme:
   live: Live
